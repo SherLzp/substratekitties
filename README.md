@@ -31,6 +31,7 @@ $ git clone https://github.com/SherLzp/substratekitties.git
 $ cd substratekitties
 $ ./build.sh
 $ cargo build --release
+$ ./target/release/substratekitties --dev --ws-external --rpc-external
 ```
 
 > Good luck！
