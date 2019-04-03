@@ -11,7 +11,7 @@ use parity_codec::{Encode, Decode};
 use rstd::prelude::*;
 #[cfg(feature = "std")]
 use primitives::bytes;
-use primitives::{ed25519, OpaqueMetadata};
+use primitives::{ed25519, sr25519, OpaqueMetadata};
 use runtime_primitives::{
 	ApplyResult, transaction_validity::TransactionValidity, generic, create_runtime_str,
 	traits::{self, NumberFor, BlakeTwo256, Block as BlockT, StaticLookup, Verify}
@@ -44,7 +44,7 @@ pub type AuthoritySignature = ed25519::Signature;
 pub type AccountId = <AccountSignature as Verify>::Signer;
 
 /// The type used by authorities to prove their ID.
-pub type AccountSignature = ed25519::Signature;
+pub type AccountSignature = sr25519::Signature;
 
 /// A hash of some data used by the chain.
 pub type Hash = primitives::H256;
@@ -57,6 +57,7 @@ pub type Nonce = u64;
 
 /// Used for the module template in `./template.rs`
 mod template;
+mod substratekitties;
 
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
@@ -67,8 +68,14 @@ pub mod opaque {
 
 	/// Opaque, encoded, unchecked extrinsic.
 	#[derive(PartialEq, Eq, Clone, Default, Encode, Decode)]
-	#[cfg_attr(feature = "std", derive(Serialize, Deserialize, Debug))]
+	#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 	pub struct UncheckedExtrinsic(#[cfg_attr(feature = "std", serde(with="bytes"))] pub Vec<u8>);
+	#[cfg(feature = "std")]
+	impl std::fmt::Debug for UncheckedExtrinsic {
+		fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+			write!(fmt, "{}", primitives::hexdisplay::HexDisplay::from(&self.0))
+		}
+	}
 	impl traits::Extrinsic for UncheckedExtrinsic {
 		fn is_signed(&self) -> Option<bool> {
 			None
@@ -86,8 +93,8 @@ pub mod opaque {
 
 /// This runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("substratekitties-demo"),
-	impl_name: create_runtime_str!("substratekitties-demo"),
+	spec_name: create_runtime_str!("substratekitties"),
+	impl_name: create_runtime_str!("substratekitties"),
 	authoring_version: 3,
 	spec_version: 3,
 	impl_version: 0,
@@ -186,6 +193,10 @@ impl template::Trait for Runtime {
 	type Event = Event;
 }
 
+impl substratekitties::Trait for Runtime{
+	type Event = Event;
+}
+
 construct_runtime!(
 	pub enum Runtime with Log(InternalLog: DigestItem<Hash, AuthorityId, AuthoritySignature>) where
 		Block = Block,
@@ -201,6 +212,7 @@ construct_runtime!(
 		Sudo: sudo,
 		// Used for the module template in `./template.rs`
 		TemplateModule: template::{Module, Call, Storage, Event<T>},
+        Substratekitties: substratekitties::{Module, Call, Storage, Event<T>},
 	}
 );
 
