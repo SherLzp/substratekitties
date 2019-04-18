@@ -8,20 +8,20 @@
 
 > or you can just clone the code and build it on linux with substrate installed environment.
 
-> to install substrate v0.11.(**old**)
+> If the bug is fixed.You can download it just one line.
 
 ```shell
 $ curl https://getsubstrate.io -sSf | bash
 ```
 
-> to install substrate v1.0(new)
+> **Don't worry if there is a bug!** Follow the code.
 
 ```shell
-$ curl https://getsubstrate.io -sSf | bash
 $ git clone https://github.com/paritytech/substrate.git
 $ cd substrate
 $ ./scripts/build.sh
 $ cargo build --release
+$ cp target/release/substrate /usr/bin/
 ```
 
 > then follow the code and  you can run the demo
