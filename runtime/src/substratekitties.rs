@@ -4,7 +4,6 @@ use system::ensure_signed;
 use runtime_primitives::traits::{As, Hash, Zero};
 use parity_codec::{Encode, Decode};
 use rstd::cmp;
-use support::traits::Currency;
 
 #[derive(Encode, Decode, Default, Clone, PartialEq)]
 #[cfg_attr(feature = "std", derive(Debug))]
@@ -52,7 +51,7 @@ decl_storage! {
 
 decl_module! {
     pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-        //引入事件模块
+
         fn deposit_event<T>() = default;
 
         fn create_kitty(origin) -> Result {
@@ -118,7 +117,7 @@ decl_module! {
             ensure!(!kitty_price.is_zero(), "The cat you want to buy is not for sale");
             ensure!(kitty_price <= max_price, "The cat you want to buy costs more than your max price");
 
-            <balances::Module<T> as Currency<_>>::transfer(&sender, &owner, kitty_price)?;
+            //<balances::Module<T>>::make_transfer(&sender, &owner, kitty_price)?;
 
             Self::transfer_from(owner.clone(), sender.clone(), kitty_id)
                 .expect("`owner` is shown to own the kitty; \
